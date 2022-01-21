@@ -1,7 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const encrypt = require('mongoose-encryption');
 const PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -17,6 +19,11 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String
 })
+
+var secret = process.env.SECRET;
+//specify exactly which fields to encrypt with the encryptedFields option. This overrides the defaults which encrypts everything except id and __v
+userSchema.plugin(encrypt, { secret: secret, encryptedFields:['password'] });
+
 
 const User = mongoose.model('User', userSchema);
 
