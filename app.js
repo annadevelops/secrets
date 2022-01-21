@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 const encrypt = require('mongoose-encryption');
-const md5 = require('md5');
+const sha512 = require('js-sha512');
 const PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -33,7 +33,7 @@ app.route('/login')
     })
     .post((req,res) => {
         const username = req.body.username;
-        const password = md5(req.body.password);
+        const password = sha512(req.body.password);
 
         User.findOne({email: username}, (err, foundUser) => {
             if(err) {
@@ -55,7 +55,7 @@ app.route('/register')
     .post((req,res) => {
         const newUser = new User({
             email: req.body.username,
-            password: md5(req.body.password)
+            password: sha512(req.body.password)
         })
 
         newUser.save((err) => {
