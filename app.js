@@ -67,6 +67,11 @@ passport.use(new GoogleStrategy({
   }
 ));
 
+const secretSchema = new mongoose.Schema({
+    content: String
+});
+
+const Secret = mongoose.model('Secret', secretSchema);
 
 app.route('/')
     .get((req,res) => {
@@ -113,7 +118,10 @@ app.route('/register')
 app.route('/secrets')
 .get((req, res) => {
     if (req.isAuthenticated()) {
-        res.render('secrets');
+        Secret.find((err, foundSecrets) => {
+            res.render('secrets', {secrets: foundSecrets}) ;
+        })
+        
     } else {
         res.redirect('/')
     }
@@ -124,6 +132,19 @@ app.route('/logout')
         req.logout();
         res.redirect('/');
     });
+
+app.route('/submit')
+    .get((req,res) => {
+        res.render('submit');
+    })
+    .post((req,res) => {
+        const secret = new Secret({
+            content: req.body.secret
+        })
+
+        secret.save();
+        res.redirect('/secrets')
+    })
 
 app.listen(PORT, () => {
     console.log(PORT + ' port is listening');
